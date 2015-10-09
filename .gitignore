@@ -1,8 +1,13 @@
 # Object files
 *.o
+*d
+*crf
 *.ko
 *.obj
 *.elf
+*.afx
+*.htm
+*.iex
 
 # Precompiled Headers
 *.gch
