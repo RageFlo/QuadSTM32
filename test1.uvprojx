@@ -436,6 +436,11 @@
               <FileType>1</FileType>
               <FilePath>.\I2C_Treiber.c</FilePath>
             </File>
+            <File>
+              <FileName>globals.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\globals.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

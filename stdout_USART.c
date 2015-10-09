@@ -33,6 +33,7 @@
  
 
 #include "stdout_USART.h"
+#include "globals.h"
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
  
 // <h>STDOUT USART Interface
@@ -42,7 +43,7 @@
 #define USART_DRV_NUM           3
  
 //   <o>Baudrate
-#define USART_BAUDRATE          19200
+#define USART_BAUDRATE          57600
  
 // </h>
  
@@ -58,8 +59,9 @@ extern ARM_DRIVER_USART  USART_Driver_(USART_DRV_NUM);
  
 static uint8_t input_buf[BUFFERSIZE_IN];
 static uint8_t command[BUFFERSIZE_COM];
-
- 
+static uint8_t kommuConnected = 0;
+static uint8_t kommuNoPing = 0;
+static const uint8_t maxPingsMissed = 40;
 
 
 
@@ -72,7 +74,7 @@ int buildCommand(uint8_t* buffer, uint8_t* command){
 	uint8_t done = 0;
 	int i;
 	int recCount = ptrUSART->GetRxCount();
-	while(recCount > currentPos || currentPos > recCount){
+	while((recCount > currentPos || currentPos > recCount) & !done){
 		currentChar = buffer[currentPos];
 		if(currentChar == 0x02){
 			gotStart = 1;
@@ -80,9 +82,12 @@ int buildCommand(uint8_t* buffer, uint8_t* command){
 				command[i] = 0;
 			}
 			commandPos = 0;
-		}else if(gotStart && currentChar == 0x03){
+		}else if(!gotStart){
+			//out of message
+		}else if(currentChar == 0x03){
 			gotStart = 0;
-			done = 1;
+			if(commandPos > 0)
+				done = 1;
 		}else if(commandPos < BUFFERSIZE_COM){
 			command[commandPos] = currentChar;
 			commandPos++;
@@ -100,6 +105,18 @@ int buildCommand(uint8_t* buffer, uint8_t* command){
 		reciving = 1;
 	}		
 	return done;
+}
+
+int sendCommand(char * toSend,int lenght){
+	//char buffer[lenght+2];
+	int i;
+	stdout_putchar(0x02);
+	for(i = 0; i < lenght; i++){
+		stdout_putchar(toSend[i]);
+	}
+	stdout_putchar(0x03);
+	
+	return 0;
 }
 void myUSART_callback(uint32_t event)
 {
@@ -125,9 +142,39 @@ void myUSART_callback(uint32_t event)
 }
 
 void kommuHandler(void){
-	if(buildCommand(input_buf,command)){
-		puts((char*)command);
+	int i;
+	char buffer[4] = {0,0,0,0};
+	while(buildCommand(input_buf,command)){
+		switch(command[0]){
+		case 'a':
+			if(kommuConnected){
+				sendCommand("a",1);
+				kommuNoPing = 0;
+			}
+		break;
+		case 'b':
+			sendCommand("c",1);
+			kommuConnected = 1;
+			kommuNoPing = 0;
+			HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
+		break;
+		}		
 	}
+	if(kommuConnected){
+		for(i = 0; i < 7; i++){
+			buffer[0]='v';
+			buffer[1]=i;
+			buffer[2]=(int8_t)(acceltempgyroVals[i]>>8);
+			buffer[3]=(uint8_t)(acceltempgyroVals[i]);
+			sendCommand(buffer,4);
+		}
+	}
+	if(kommuNoPing > maxPingsMissed){ //Max ping loss?
+		kommuConnected = 0;
+		HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_RESET);
+	}else{
+		kommuNoPing++;
+	}		
 }
 
 int startRec(uint8_t* buffer){

@@ -3,6 +3,7 @@
 ".\objects\stm32f4xx_it.o"
 ".\objects\stdout_usart.o"
 ".\objects\i2c_treiber.o"
+".\objects\globals.o"
 "C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Lib\ARM\arm_cortexM4lf_math.lib"
 ".\objects\usart_stm32f4xx.o"
 ".\objects\retarget_io.o"

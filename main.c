@@ -45,6 +45,7 @@
 #include "main.h"
 #include "stdout_USART.h"
 #include "I2C_Treiber.h"
+#include "globals.h"
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -76,19 +77,20 @@ static void Error_Handler(void);
 int main(void)
 {
 	GPIO_InitTypeDef ledGPIOInit;
-
 	
-  /* Configure the system clock to 168 MHz */
-  SystemClock_Config();
+	int delay = 0;
+	HAL_Init();	
+	/* Configure the system clock to 168 MHz */
+	SystemClock_Config();
 	std_init();
-  HAL_Init();
+
 	//stdin_init();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	
 	ledGPIOInit.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
 	ledGPIOInit.Mode = GPIO_MODE_OUTPUT_PP;
 	ledGPIOInit.Pull = GPIO_NOPULL;
-  ledGPIOInit.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	ledGPIOInit.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOD,&ledGPIOInit);
 	HAL_Delay(500);
 	if(initMPU()){
@@ -96,13 +98,18 @@ int main(void)
 	}
 	
 	puts("Hi!!");
-  /* Infinite loop */
-  while (1)
-  {
-		HAL_Delay(500);
-		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15);
+	/* Infinite loop */
+	while (1)
+	{
+		HAL_Delay(100);
+		MPU6050_GetRawAccelGyro(acceltempgyroVals);
+		if((delay++)%100>100)
+		printf("res: %04d,%04d,%04d,  %04d,  %04d,%04d,%04d\n",
+		acceltempgyroVals[0],acceltempgyroVals[1],acceltempgyroVals[2],acceltempgyroVals[3],
+		acceltempgyroVals[4],acceltempgyroVals[5],acceltempgyroVals[6]);
+		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 		kommuHandler();
-  }
+	}
 }
 
 /**
