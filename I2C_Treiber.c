@@ -49,13 +49,13 @@ int initMPU(void){
 	HAL_I2C_StateTypeDef state;
 	uint8_t tempByte = 13;
 	uint8_t buffer[10] = {0,0,0,0,0,0,0,0,0,0};
-	
+	hnd.Instance = I2C1;
 	hnd.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
 	hnd.Init.ClockSpeed	= 400000;
 	hnd.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	hnd.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
 	hnd.Init.DutyCycle = I2C_DUTYCYCLE_2;
-	hnd.Init.NoStretchMode = I2C_NOSTRETCH_ENABLE;
+	hnd.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 	hnd.Init.OwnAddress1 = 0x00;
 	
 	HAL_I2C_Init(&hnd);
@@ -67,7 +67,7 @@ int initMPU(void){
 	buffer[0]=MPU6050_RA_PWR_MGMT_1;
 	buffer[1]=0x80;
 	printf("READ: %u",SCCB_Read(MPU6050_RA_WHO_AM_I));
-	
+	printf("error: %u",HAL_I2C_GetError(&hnd));
 	return initOkay;
 
 }
@@ -88,9 +88,10 @@ uint8_t SCCB_Write(uint8_t addr, uint8_t data)
 uint8_t SCCB_Read(uint8_t addr)
 {
     uint8_t data=0;
-
+		uint8_t res =  HAL_I2C_Master_Transmit(&hnd, SLAVE_ADDR, &addr, 1, TIMEOUT);
+	printf("res: %u",res);
     //__disable_irq();
-    if (HAL_I2C_Master_Transmit(&hnd, SLAVE_ADDR, &addr, 1, TIMEOUT) != HAL_OK) {
+    if (res != HAL_OK) {
         data = 0xFF;
         goto error_w;
     }
