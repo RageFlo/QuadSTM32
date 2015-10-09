@@ -44,21 +44,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stdout_USART.h"
+#include "I2C_Treiber.h"
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
 #endif
-#ifdef RTE_CMSIS_RTOS                   // when RTE component CMSIS RTOS is used
-#include "cmsis_os.h"                   // CMSIS RTOS header file
-#endif
 
-#ifdef RTE_CMSIS_RTOS_RTX
-extern uint32_t os_time;
-
-uint32_t HAL_GetTick(void) { 
-  return os_time; 
-}
-#endif
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -85,11 +76,12 @@ static void Error_Handler(void);
 int main(void)
 {
 	GPIO_InitTypeDef ledGPIOInit;
-  HAL_Init();
+
 	
   /* Configure the system clock to 168 MHz */
   SystemClock_Config();
 	std_init();
+  HAL_Init();
 	//stdin_init();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	
@@ -98,12 +90,16 @@ int main(void)
 	ledGPIOInit.Pull = GPIO_NOPULL;
   ledGPIOInit.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOD,&ledGPIOInit);
+	HAL_Delay(500);
+	if(initMPU()){
+		puts("Failed MPU");
+	}
 	
-	puts("Hi!!\r");
+	puts("Hi!!");
   /* Infinite loop */
   while (1)
   {
-		HAL_Delay(100);
+		HAL_Delay(500);
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15);
 		kommuHandler();
   }
