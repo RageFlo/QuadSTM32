@@ -1,5 +1,5 @@
 Dependencies for Project 'test1', Target 'Target 1': (DO NOT MODIFY !)
-F (.\main.c)(0x5618489B)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc-D__UVISION_VERSION="516" -D_RTE_ -DSTM32F407xx-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
+F (.\main.c)(0x561A2185)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc-D__UVISION_VERSION="516" -D_RTE_ -DSTM32F407xx-o .\objects\main.o --omf_browse .\objects\main.crf --depend .\objects\main.d)
 I (main.h)(0x5617C69A)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x55BF2672)
 I (C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx\stm32f4xx_hal_conf.h)(0x5618476E)
@@ -42,7 +42,7 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include\Driver_Common.h)(0x5
 I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x55AF4A52)
 I (C:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x55AF4A52)
 I (I2C_Treiber.h)(0x5617E9DD)
-I (globals.h)(0x561803AA)
+I (globals.h)(0x5618E693)
 F (.\stm32f4xx_it.c)(0x5617C69A)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc-D__UVISION_VERSION="516" -D_RTE_ -DSTM32F407xx-o .\objects\stm32f4xx_it.o --omf_browse .\objects\stm32f4xx_it.crf --depend .\objects\stm32f4xx_it.d)
 I (main.h)(0x5617C69A)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x55BF2672)
@@ -122,8 +122,8 @@ I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h)(0x55BF2672)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h)(0x55BF2672)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h)(0x55BF266E)
-I (globals.h)(0x561803AA)
-F (.\I2C_Treiber.c)(0x5618489B)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc-D__UVISION_VERSION="516" -D_RTE_ -DSTM32F407xx-o .\objects\i2c_treiber.o --omf_browse .\objects\i2c_treiber.crf --depend .\objects\i2c_treiber.d)
+I (globals.h)(0x5618E693)
+F (.\I2C_Treiber.c)(0x561A2186)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc-D__UVISION_VERSION="516" -D_RTE_ -DSTM32F407xx-o .\objects\i2c_treiber.o --omf_browse .\objects\i2c_treiber.crf --depend .\objects\i2c_treiber.d)
 I (I2C_Treiber.h)(0x5617E9DD)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h)(0x55BF2646)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f407xx.h)(0x55BF2646)
@@ -160,9 +160,9 @@ I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h)(0x55BF2672)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h)(0x55BF2672)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h)(0x55BF266E)
-I (globals.h)(0x561803AA)
-F (.\globals.c)(0x561806A6)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc-D__UVISION_VERSION="516" -D_RTE_ -DSTM32F407xx-o .\objects\globals.o --omf_browse .\objects\globals.crf --depend .\objects\globals.d)
-I (globals.h)(0x561803AA)
+I (globals.h)(0x5618E693)
+F (.\globals.c)(0x5618E986)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE-I C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Driver\Include-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc-D__UVISION_VERSION="516" -D_RTE_ -DSTM32F407xx-o .\objects\globals.o --omf_browse .\objects\globals.crf --depend .\objects\globals.d)
+I (globals.h)(0x5618E693)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x55BF2672)
 I (C:\Users\Florian\Documents\arm\QuadSTM32\RTE\Device\STM32F407VGTx\stm32f4xx_hal_conf.h)(0x5618476E)
 I (C:\Users\Florian\Documents\arm\QuadSTM32\RTE\RTE_Components.h)(0x5617C69A)

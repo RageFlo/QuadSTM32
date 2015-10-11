@@ -31,20 +31,23 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
   //init GPIOB PIN7 (SDA-Pin)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
-	GPIO_InitStruct.Pin = GPIO_PIN_8;
+	GPIO_InitStruct.Pin = GPIO_PIN_3;
 	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 	
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
  
-	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0x0F , 4);
-	//HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+	
+	
   //Setup the Interruptlevel
   HAL_NVIC_SetPriority(I2C1_EV_IRQn, 1, 1);
 	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 1, 1);
   //enable the interrupt for USART1
   HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
 	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+
+	HAL_NVIC_SetPriority(EXTI3_IRQn, 0x0F , 4);
+	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 }
 
 void I2C1_Handler(void) {
@@ -53,9 +56,14 @@ void I2C1_Handler(void) {
 	HAL_I2C_ER_IRQHandler(&hnd);  //Errorhandler
 }
 
-void EXTI9_5_IRQHandler(void){
+void EXTI3_IRQHandler(void){
+	HAL_Delay10u(10);
 	MPU6050_GetRawAccelGyro(acceltempgyroVals);
+	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_3);
+	HAL_NVIC_ClearPendingIRQ(EXTI3_IRQn);
+	__HAL_PVD_EXTI_CLEAR_FLAG(EXTI3_IRQn);
 }
+
 int initMPU(void){
 	int initOkay = -1;
 	HAL_I2C_StateTypeDef state;

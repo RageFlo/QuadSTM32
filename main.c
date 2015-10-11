@@ -102,7 +102,7 @@ int main(void)
 	while (1)
 	{
 		HAL_Delay(100);
-		MPU6050_GetRawAccelGyro(acceltempgyroVals);
+		//MPU6050_GetRawAccelGyro(acceltempgyroVals);
 		if((delay++)%100>100)
 		printf("res: %04d,%04d,%04d,  %04d,  %04d,%04d,%04d\n",
 		acceltempgyroVals[0],acceltempgyroVals[1],acceltempgyroVals[2],acceltempgyroVals[3],
@@ -180,6 +180,9 @@ static void SystemClock_Config(void)
     __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
   }
 }
+
+
+
 /**
   * @brief  This function is executed in case of error occurrence.
   * @param  None
