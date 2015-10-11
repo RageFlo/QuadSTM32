@@ -103,10 +103,7 @@ int main(void)
 	{
 		HAL_Delay(100);
 		//MPU6050_GetRawAccelGyro(acceltempgyroVals);
-		if((delay++)%100>100)
-		printf("res: %04d,%04d,%04d,  %04d,  %04d,%04d,%04d\n",
-		acceltempgyroVals[0],acceltempgyroVals[1],acceltempgyroVals[2],acceltempgyroVals[3],
-		acceltempgyroVals[4],acceltempgyroVals[5],acceltempgyroVals[6]);
+
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 		kommuHandler();
 	}

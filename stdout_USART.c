@@ -143,6 +143,7 @@ void myUSART_callback(uint32_t event)
 
 void kommuHandler(void){
 	int i;
+	int16_t smallMPU;
 	char buffer[4] = {0,0,0,0};
 	while(buildCommand(input_buf,command)){
 		switch(command[0]){
@@ -164,8 +165,8 @@ void kommuHandler(void){
 		for(i = 0; i < 7; i++){
 			buffer[0]='v';
 			buffer[1]=i;
-			buffer[2]=(int8_t)(acceltempgyroVals[i]>>8);
-			buffer[3]=(uint8_t)(acceltempgyroVals[i]);
+			buffer[2]=(uint8_t)(acceltempgyroValsFiltered[i]>>8);
+			buffer[3]=(uint8_t)(acceltempgyroValsFiltered[i]);
 			sendCommand(buffer,4);
 		}
 	}

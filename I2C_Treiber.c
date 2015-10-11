@@ -47,21 +47,36 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
 
 	HAL_NVIC_SetPriority(EXTI3_IRQn, 0x0F , 4);
-	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
 }
 
-void I2C1_Handler(void) {
-	//Call Hal_I2C_EventHandler
+volatile void I2C1_EV_IRQHandler(void) {
 	HAL_I2C_EV_IRQHandler(&hnd);  //Eventhandler - Dieser kümmert sich automatisch um das erzeugen von Startconditions, ACKs, NACKs, Stopbits und Stopcondition
+}
+
+volatile void I2C1_ER_IRQHandler(void) {
 	HAL_I2C_ER_IRQHandler(&hnd);  //Errorhandler
 }
 
-void EXTI3_IRQHandler(void){
-	HAL_Delay10u(10);
+volatile void EXTI3_IRQHandler(void){
+	static uint32_t last = 0;
+	uint32_t current = HAL_GetTick10u();
+	timeDiffMPU = current - last;
+	last = current;
+	HAL_Delay10u(5);
 	MPU6050_GetRawAccelGyro(acceltempgyroVals);
-	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_3);
+	//lowPassFilterGyro();
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 	HAL_NVIC_ClearPendingIRQ(EXTI3_IRQn);
-	__HAL_PVD_EXTI_CLEAR_FLAG(EXTI3_IRQn);
+}
+
+void lowPassFilterGyro(void){
+	int i;
+	int32_t temp = 0;
+	for(i = 0; i < 7; i++){
+		temp = acceltempgyroValsFiltered[i]*9 + acceltempgyroVals[i];
+		acceltempgyroVals[i] = temp/10;
+	}
 }
 
 int initMPU(void){
@@ -91,7 +106,7 @@ int initMPU(void){
 	printf("WHO IS MPU: %x\n",SCCB_Read(MPU6050_RA_WHO_AM_I));
 	
 	Initial_MPU6050();
-	
+		HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 	//MPU6050_GetRawAccelGyro(acceltempgyroVals);
 	//HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	
@@ -210,7 +225,7 @@ void MPU6050_GetRawAccelGyro(int16_t* AccelGyro)
 {
     uint8_t tmpBuffer[14];
 		int32_t i;
-	  HAL_I2C_Mem_Read(&hnd,MPU6050_DEFAULT_ADDRESS,MPU6050_RA_ACCEL_XOUT_H,1,tmpBuffer,14,3);
+	  HAL_I2C_Mem_Read_IT(&hnd,MPU6050_DEFAULT_ADDRESS,MPU6050_RA_ACCEL_XOUT_H,1,tmpBuffer,14);
     /* Get acceleration */
     for (i = 0; i < 3; i++)
         AccelGyro[i] = ((int16_t) ((uint16_t) tmpBuffer[2 * i] << 8) + tmpBuffer[2 * i + 1]);
