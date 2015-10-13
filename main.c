@@ -43,9 +43,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "globals.h"
 #include "stdout_USART.h"
 #include "I2C_Treiber.h"
-#include "globals.h"
+#include "Daten_Filter.h"
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -77,8 +78,8 @@ static void Error_Handler(void);
 int main(void)
 {
 	GPIO_InitTypeDef ledGPIOInit;
-	
-	int delay = 0;
+	uint32_t delayTime;
+
 	HAL_Init();	
 	/* Configure the system clock to 168 MHz */
 	SystemClock_Config();
@@ -92,16 +93,23 @@ int main(void)
 	ledGPIOInit.Pull = GPIO_NOPULL;
 	ledGPIOInit.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOD,&ledGPIOInit);
-	HAL_Delay(500);
+	HAL_Delay(10);
+	
 	if(initMPU()){
 		puts("Failed MPU");
 	}
 	
+	Get_Gyro_Offset_Start();
+	HAL_Delay(100);
+	Get_Gyro_Offset_Stopp();
+	delayTime = HAL_GetTick();
 	puts("Hi!!");
+	
 	/* Infinite loop */
 	while (1)
 	{
-		HAL_Delay(100);
+		while(HAL_GetTick()-delayTime<100){}
+		delayTime = HAL_GetTick();
 		//MPU6050_GetRawAccelGyro(acceltempgyroVals);
 
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);

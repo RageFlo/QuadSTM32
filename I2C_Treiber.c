@@ -1,5 +1,6 @@
 #include "I2C_Treiber.h"
 #include "globals.h"
+#include "Daten_Filter.h"
 #include <stdio.h>
 #define SLAVE_ADDR (MPU6050_ADDRESS_AD0_LOW<<1)
 #define TIMEOUT 2000
@@ -133,22 +134,16 @@ volatile void I2C1_ER_IRQHandler(void) {
 volatile void EXTI3_IRQHandler(void){
 	static uint32_t last = 0;
 	uint32_t current = HAL_GetTick10u();
+	
 	timeDiffMPU = current - last;
 	last = current;
 	MPU6050_GetRawAccelGyro(acceltempgyroVals);
-	//lowPassFilterGyro();
+	lowPassFilterGyro();
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 	HAL_NVIC_ClearPendingIRQ(EXTI3_IRQn);
 }
 
-void lowPassFilterGyro(void){
-	int i;
-	int32_t temp = 0;
-	for(i = 0; i < 7; i++){
-		temp = acceltempgyroValsFiltered[i]*9 + acceltempgyroVals[i];
-		acceltempgyroValsFiltered[i] = temp/10;
-	}
-}
+
 
 int initMPU(void){
 	int initOkay = -1;
@@ -156,7 +151,7 @@ int initMPU(void){
 	hnd.Instance = I2C1;
 
 	hnd.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-	hnd.Init.ClockSpeed	= 100000;	//DEF MODE
+	hnd.Init.ClockSpeed	= 400000;	//DEF MODE
 	hnd.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	hnd.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
 	hnd.Init.DutyCycle = I2C_DUTYCYCLE_2;
@@ -165,7 +160,7 @@ int initMPU(void){
 	hnd.Init.OwnAddress2 = 2;
 	
 	HAL_I2C_Init(&hnd);
-	
+
 	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
 	
 	HAL_Delay(50);
@@ -303,6 +298,11 @@ void MPU6050_GetRawAccelGyro(int16_t* AccelGyro)
 			error = HAL_I2C_Mem_Read_DMA(&hnd,MPU6050_DEFAULT_ADDRESS,MPU6050_RA_ACCEL_XOUT_H,1,tmpBuffer,14);
 			if(error!=HAL_OK){
 				HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_SET);
+				HAL_I2C_DeInit(&hnd);
+				HAL_I2C_Init(&hnd);
+				
+			}else{
+				HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_RESET);
 			}
 		}
 	  //HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_RESET);

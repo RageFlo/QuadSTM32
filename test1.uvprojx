@@ -441,6 +441,11 @@
               <FileType>1</FileType>
               <FilePath>.\globals.c</FilePath>
             </File>
+            <File>
+              <FileName>Daten_Filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Daten_Filter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

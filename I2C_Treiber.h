@@ -17,7 +17,7 @@ uint8_t SCCB_Write(uint8_t addr, uint8_t data);
 uint8_t SCCB_Read(uint8_t addr);
 
 void Initial_MPU6050(void);
-void lowPassFilterGyro(void);
+
 
 void MPU6050_WriteBits(uint8_t slaveAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data);
 void MPU6050_WriteBit(uint8_t slaveAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data);
