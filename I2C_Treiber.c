@@ -5,6 +5,22 @@
 #define TIMEOUT 2000
 
 static I2C_HandleTypeDef hnd;
+static DMA_HandleTypeDef hndDMArx;
+static DMA_HandleTypeDef hndDMAtx;
+static uint8_t buffer[14];
+static uint8_t tmpBuffer[14];
+
+
+
+void DMA1_Stream3_IRQHandler(void) {
+	HAL_DMA_IRQHandler(hnd.hdmarx);
+}
+
+void DMA1_Stream7_IRQHandler(void) {
+	HAL_DMA_IRQHandler(hnd.hdmatx);
+}
+
+
 
 void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 {
@@ -15,6 +31,9 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
  
   //Enable the I2C-Clock
   __I2C1_CLK_ENABLE();
+	
+	//Enable the DMA-Clock
+	__DMA1_CLK_ENABLE();
  
   //Configure GPIOB Pin_6 as SCL for I2C
   GPIO_InitStruct.Pin       = GPIO_PIN_6;
@@ -31,12 +50,55 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
   //init GPIOB PIN7 (SDA-Pin)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
-	GPIO_InitStruct.Pin = GPIO_PIN_3;
-	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-	
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Alternate = 0;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Alternate = 0;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
  
+	hndDMArx.Instance = DMA1_Stream3;
+	hndDMArx.Init.Channel = DMA_CHANNEL_7;
+	hndDMArx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+	hndDMArx.Init.PeriphInc = DMA_PINC_DISABLE;
+	hndDMArx.Init.MemInc = DMA_MINC_ENABLE;
+	hndDMArx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+	hndDMArx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+	hndDMArx.Init.Mode = DMA_NORMAL;
+	hndDMArx.Init.Priority = DMA_PRIORITY_MEDIUM;
+	hndDMArx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+	hndDMArx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+	hndDMArx.Init.PeriphBurst = DMA_PBURST_SINGLE;
+	hndDMArx.Init.MemBurst = DMA_MBURST_SINGLE;
+
+
+	HAL_DMA_Init(&hndDMArx);
+	
+	__HAL_LINKDMA(hi2c, hdmarx, hndDMArx);
+	
+	hndDMAtx.Instance = DMA1_Stream7;
+	hndDMAtx.Init.Channel = DMA_CHANNEL_7;
+	hndDMAtx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+	hndDMAtx.Init.PeriphInc = DMA_PINC_DISABLE;
+	hndDMAtx.Init.MemInc = DMA_MINC_ENABLE;
+	hndDMAtx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+	hndDMAtx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+	hndDMAtx.Init.Mode = DMA_NORMAL;
+	hndDMAtx.Init.Priority = DMA_PRIORITY_MEDIUM;
+	hndDMAtx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+	hndDMAtx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+	hndDMAtx.Init.PeriphBurst = DMA_PBURST_SINGLE;
+	hndDMAtx.Init.MemBurst = DMA_MBURST_SINGLE;
+
+
+	HAL_DMA_Init(&hndDMAtx);
+	
+	__HAL_LINKDMA(hi2c, hdmatx, hndDMAtx);
 	
 	
   //Setup the Interruptlevel
@@ -46,9 +108,19 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
   HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
 	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
 
-	HAL_NVIC_SetPriority(EXTI3_IRQn, 0x0F , 4);
+	HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 1);
+	HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 1);
 
+  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn); 
+  HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);  
+
+ 
+
+	HAL_NVIC_SetPriority(EXTI3_IRQn, 0x0F , 4);
 }
+
+
+
 
 volatile void I2C1_EV_IRQHandler(void) {
 	HAL_I2C_EV_IRQHandler(&hnd);  //Eventhandler - Dieser kümmert sich automatisch um das erzeugen von Startconditions, ACKs, NACKs, Stopbits und Stopcondition
@@ -63,7 +135,6 @@ volatile void EXTI3_IRQHandler(void){
 	uint32_t current = HAL_GetTick10u();
 	timeDiffMPU = current - last;
 	last = current;
-	HAL_Delay10u(5);
 	MPU6050_GetRawAccelGyro(acceltempgyroVals);
 	//lowPassFilterGyro();
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
@@ -75,7 +146,7 @@ void lowPassFilterGyro(void){
 	int32_t temp = 0;
 	for(i = 0; i < 7; i++){
 		temp = acceltempgyroValsFiltered[i]*9 + acceltempgyroVals[i];
-		acceltempgyroVals[i] = temp/10;
+		acceltempgyroValsFiltered[i] = temp/10;
 	}
 }
 
@@ -85,19 +156,19 @@ int initMPU(void){
 	hnd.Instance = I2C1;
 
 	hnd.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-	hnd.Init.ClockSpeed	= 400000;
+	hnd.Init.ClockSpeed	= 100000;	//DEF MODE
 	hnd.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	hnd.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
 	hnd.Init.DutyCycle = I2C_DUTYCYCLE_2;
 	hnd.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-	hnd.Init.OwnAddress1 = 104;
-	hnd.Init.OwnAddress2 = 0;
+	hnd.Init.OwnAddress1 = 1;
+	hnd.Init.OwnAddress2 = 2;
 	
 	HAL_I2C_Init(&hnd);
 	
- // HAL_I2CEx_AnalogFilter_Config(&hnd, I2C_ANALOGFILTER_ENABLED);
+	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
 	
-	__HAL_I2C_ENABLE(&hnd);
+	HAL_Delay(50);
 	
 	state = HAL_I2C_GetState(&hnd); 
 	if(state == HAL_I2C_STATE_READY){
@@ -106,10 +177,9 @@ int initMPU(void){
 	printf("WHO IS MPU: %x\n",SCCB_Read(MPU6050_RA_WHO_AM_I));
 	
 	Initial_MPU6050();
-		HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-	//MPU6050_GetRawAccelGyro(acceltempgyroVals);
-	//HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 	
+	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
 	return initOkay;
 
 }
@@ -223,9 +293,19 @@ void MPU6050_ReadBit(uint8_t slaveAddr, uint8_t regAddr, uint8_t bitNum, uint8_t
 }
 void MPU6050_GetRawAccelGyro(int16_t* AccelGyro)
 {
-    uint8_t tmpBuffer[14];
+
 		int32_t i;
-	  HAL_I2C_Mem_Read_IT(&hnd,MPU6050_DEFAULT_ADDRESS,MPU6050_RA_ACCEL_XOUT_H,1,tmpBuffer,14);
+		HAL_StatusTypeDef error;
+//	  if(HAL_I2C_Mem_Read(&hnd,MPU6050_DEFAULT_ADDRESS,MPU6050_RA_ACCEL_XOUT_H,1,tmpBuffer,14,3)!=HAL_OK){
+//			HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_SET);
+//		}
+		if(HAL_I2C_GetState(&hnd) == HAL_I2C_STATE_READY){
+			error = HAL_I2C_Mem_Read_DMA(&hnd,MPU6050_DEFAULT_ADDRESS,MPU6050_RA_ACCEL_XOUT_H,1,tmpBuffer,14);
+			if(error!=HAL_OK){
+				HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_SET);
+			}
+		}
+	  //HAL_GPIO_WritePin(GPIOD,GPIO_PIN_13,GPIO_PIN_RESET);
     /* Get acceleration */
     for (i = 0; i < 3; i++)
         AccelGyro[i] = ((int16_t) ((uint16_t) tmpBuffer[2 * i] << 8) + tmpBuffer[2 * i + 1]);

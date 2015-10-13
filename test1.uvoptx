@@ -169,7 +169,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGTARM</Key>
-          <Name>(1010=848,172,1258,718,0)(1007=105,136,282,400,0)(1008=90,120,456,345,0)(1009=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
+          <Name>(1010=956,222,1366,768,0)(1007=105,136,282,400,0)(1008=90,120,456,345,0)(1009=-1,-1,-1,-1,0)(1012=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -243,6 +243,10 @@
       <LintConfigFile></LintConfigFile>
       <bLintAuto>0</bLintAuto>
       <SystemViewers>
+        <Entry>
+          <Name>System Viewer\DMA1</Name>
+          <WinId>35900</WinId>
+        </Entry>
         <Entry>
           <Name>System Viewer\EXTI</Name>
           <WinId>35901</WinId>

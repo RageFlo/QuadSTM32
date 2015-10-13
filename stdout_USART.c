@@ -165,8 +165,8 @@ void kommuHandler(void){
 		for(i = 0; i < 7; i++){
 			buffer[0]='v';
 			buffer[1]=i;
-			buffer[2]=(uint8_t)(acceltempgyroValsFiltered[i]>>8);
-			buffer[3]=(uint8_t)(acceltempgyroValsFiltered[i]);
+			buffer[2]=(uint8_t)(acceltempgyroVals[i]>>8);
+			buffer[3]=(uint8_t)(acceltempgyroVals[i]);
 			sendCommand(buffer,4);
 		}
 	}
