@@ -12,11 +12,11 @@ static uint8_t tmpBuffer[14];
 
 
 
-void DMA1_Stream3_IRQHandler(void) {
+void DMA1_Stream5_IRQHandler(void) {
 	HAL_DMA_IRQHandler(hnd.hdmarx);
 }
 
-void DMA1_Stream7_IRQHandler(void) {
+void DMA1_Stream6_IRQHandler(void) {
 	HAL_DMA_IRQHandler(hnd.hdmatx);
 }
 
@@ -62,8 +62,8 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
   GPIO_InitStruct.Alternate = 0;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
  
-	hndDMArx.Instance = DMA1_Stream3;
-	hndDMArx.Init.Channel = DMA_CHANNEL_7;
+	hndDMArx.Instance = DMA1_Stream5;
+	hndDMArx.Init.Channel = DMA_CHANNEL_1;
 	hndDMArx.Init.Direction = DMA_PERIPH_TO_MEMORY;
 	hndDMArx.Init.PeriphInc = DMA_PINC_DISABLE;
 	hndDMArx.Init.MemInc = DMA_MINC_ENABLE;
@@ -81,8 +81,8 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 	
 	__HAL_LINKDMA(hi2c, hdmarx, hndDMArx);
 	
-	hndDMAtx.Instance = DMA1_Stream7;
-	hndDMAtx.Init.Channel = DMA_CHANNEL_7;
+	hndDMAtx.Instance = DMA1_Stream6;
+	hndDMAtx.Init.Channel = DMA_CHANNEL_1;
 	hndDMAtx.Init.Direction = DMA_MEMORY_TO_PERIPH;
 	hndDMAtx.Init.PeriphInc = DMA_PINC_DISABLE;
 	hndDMAtx.Init.MemInc = DMA_MINC_ENABLE;
@@ -108,11 +108,11 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
   HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
 	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
 
-	HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 1);
-	HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 1);
+	HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 1);
+	HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 1);
 
-  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn); 
-  HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);  
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn); 
+  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);  
 
  
 

@@ -25,8 +25,6 @@
 ".\objects\stm32f4xx_hal_usart.o"
 ".\objects\startup_stm32f407xx.o"
 ".\objects\system_stm32f4xx.o"
---library_type=microlib --ro-base 0x08000000 --entry 0x08000000 --rw-base 0x20000000 --entry Reset_Handler --first __Vectors
---feedback ".\Objects\test1.fed" --feedback_image=none
---strict --summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--library_type=microlib --ro-base 0x08000000 --entry 0x08000000 --rw-base 0x20000000 --entry Reset_Handler --first __Vectors --strict --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list ".\Listings\test1.map" -o .\Objects\test1.axf
