@@ -4,6 +4,9 @@ int16_t acceltempgyroVals[7] = {0,0,0,0,0,0,0};
 int16_t acceltempgyroValsFiltered[7] = {0,0,0,0,0,0,0};
 int32_t timeDiffMPU = 0;
 
+ int32_t angleGyro[3] = {0,0,0};
+ int32_t angleAccel[3] = {0,0,0};
+
 static __IO uint32_t uwTick = 0;
 static __IO uint32_t uwTick10u = 0;
 
