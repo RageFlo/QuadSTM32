@@ -55,9 +55,12 @@ extern ARM_DRIVER_USART  USART_Driver_(USART_DRV_NUM);
 #define ptrUSART       (&USART_Driver_(USART_DRV_NUM))
  
 #define BUFFERSIZE_IN 100
+#define BUFFERSIZE_OUT 100
 #define BUFFERSIZE_COM 10
  
 static uint8_t input_buf[BUFFERSIZE_IN];
+static uint8_t output_buffer1[BUFFERSIZE_OUT];
+static uint8_t output_buffer2[BUFFERSIZE_OUT];
 static uint8_t command[BUFFERSIZE_COM];
 static uint8_t kommuConnected = 0;
 static uint8_t kommuNoPing = 0;
@@ -107,14 +110,30 @@ int buildCommand(uint8_t* buffer, uint8_t* command){
 	return done;
 }
 
+
+
 int sendCommand(char * toSend,int lenght){
-	//char buffer[lenght+2];
+	static int currentBufferNr = 1;
+	static int currentPos = 0;
+	static uint8_t* currentBuffer = output_buffer1;
+
 	int i;
-	stdout_putchar(0x02);
+	currentBuffer[currentPos++] = 0x02;
 	for(i = 0; i < lenght; i++){
-		stdout_putchar(toSend[i]);
+		currentBuffer[currentPos++] = toSend[i];
 	}
-	stdout_putchar(0x03);
+	currentBuffer[currentPos++] = 0x03;
+	if(!ptrUSART->GetStatus().tx_busy){
+		ptrUSART->Send(currentBuffer,currentPos+1);
+		if(currentBufferNr == 1){
+			currentBuffer = output_buffer2;
+			currentBufferNr = 2;
+		}else{
+			currentBuffer = output_buffer1;
+			currentBufferNr = 1;
+		}
+		currentPos++;
+	}
 	
 	return 0;
 }
