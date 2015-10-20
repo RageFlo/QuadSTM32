@@ -27,12 +27,9 @@ void lowPassFilterGyro(void){
 		for(i = 4; i < 7; i++){
 			temp = acceltempgyroValsFiltered[i]*1 + acceltempgyroVals[i] - gyroOffsets[i-4];
 			acceltempgyroValsFiltered[i] = temp/2;
-			angleGyro[i-4] = acceltempgyroValsFiltered[i];
+			angleGyro[i-4] += acceltempgyroValsFiltered[i];
 		}
 	}		
-
-
-	
 }
 
 void Get_Gyro_Offset_Start(void){

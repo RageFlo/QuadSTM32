@@ -57,10 +57,14 @@ extern ARM_DRIVER_USART  USART_Driver_(USART_DRV_NUM);
 #define BUFFERSIZE_IN 100
 #define BUFFERSIZE_OUT 100
 #define BUFFERSIZE_COM 10
+#define MAX_SENDING_CODES 8
  
 static uint8_t input_buf[BUFFERSIZE_IN];
 static uint8_t output_buffer1[BUFFERSIZE_OUT];
 static uint8_t output_buffer2[BUFFERSIZE_OUT];
+static uint8_t buffer[10];
+static uint8_t sendingCodes[MAX_SENDING_CODES];
+static uint8_t sendingCodesCurrent = 0;
 static uint8_t command[BUFFERSIZE_COM];
 static uint8_t kommuConnected = 0;
 static uint8_t kommuNoPing = 0;
@@ -112,7 +116,7 @@ int buildCommand(uint8_t* buffer, uint8_t* command){
 
 
 
-int sendCommand(char * toSend,int lenght){
+int sendCommand(uint8_t * toSend,int lenght){
 	static int currentBufferNr = 1;
 	static int currentPos = 0;
 	static uint8_t* currentBuffer = output_buffer1;
@@ -124,7 +128,7 @@ int sendCommand(char * toSend,int lenght){
 	}
 	currentBuffer[currentPos++] = 0x03;
 	if(!ptrUSART->GetStatus().tx_busy){
-		ptrUSART->Send(currentBuffer,currentPos+1);
+		ptrUSART->Send(currentBuffer,currentPos);
 		if(currentBufferNr == 1){
 			currentBuffer = output_buffer2;
 			currentBufferNr = 2;
@@ -132,7 +136,7 @@ int sendCommand(char * toSend,int lenght){
 			currentBuffer = output_buffer1;
 			currentBufferNr = 1;
 		}
-		currentPos++;
+		currentPos = 0;
 	}
 	
 	return 0;
@@ -160,10 +164,24 @@ void myUSART_callback(uint32_t event)
 	}
 }
 
+void sendCode(uint8_t codeToSend, uint8_t* dataBuffer){
+	int lenght = 2;
+	if(codeToSend <= 0x07){
+		buffer[2] = (uint8_t)(acceltempgyroValsFiltered[codeToSend]>>8);
+		buffer[3] = (uint8_t)(acceltempgyroValsFiltered[codeToSend]);
+		lenght += 2;
+	}
+	sendCommand(buffer, lenght);
+}
+
+void startRecording(uint8_t code){
+	if(sendingCodesCurrent < (MAX_SENDING_CODES-1)){
+		sendingCodes[sendingCodesCurrent++] = code-'0';
+	}
+}
+
 void kommuHandler(void){
 	int i;
-	int16_t smallMPU;
-	char buffer[4] = {0,0,0,0};
 	while(buildCommand(input_buf,command)){
 		switch(command[0]){
 		case 'a':
@@ -178,15 +196,18 @@ void kommuHandler(void){
 			kommuNoPing = 0;
 			HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
 		break;
+		case 'r':
+			if(kommuConnected){
+				startRecording(command[1]);
+			}
+			break;
 		}		
 	}
 	if(kommuConnected){
-		for(i = 0; i < 7; i++){
+		for(i = 0; i < sendingCodesCurrent; i++){
 			buffer[0]='v';
-			buffer[1]=i;
-			buffer[2]=(uint8_t)(acceltempgyroValsFiltered[i]>>8);
-			buffer[3]=(uint8_t)(acceltempgyroValsFiltered[i]);
-			sendCommand(buffer,4);
+			buffer[1]= sendingCodes[i];
+			sendCode(sendingCodes[i],buffer);
 		}
 	}
 	if(kommuNoPing > maxPingsMissed){ //Max ping loss?
@@ -196,6 +217,8 @@ void kommuHandler(void){
 		kommuNoPing++;
 	}		
 }
+
+
 
 int startRec(uint8_t* buffer){
 	if (ptrUSART->Receive(buffer, BUFFERSIZE_IN) != ARM_DRIVER_OK) {
