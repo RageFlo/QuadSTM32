@@ -10,14 +10,14 @@ void lowPassFilterGyro(void){
 	int i;
 	int32_t temp = 0;
 	for(i = 0; i < 4; i++){
-		temp = acceltempgyroValsFiltered[i]*1 + acceltempgyroVals[i];
-		acceltempgyroValsFiltered[i] = temp/2;
+		temp = acceltempgyroVals[i];
+		acceltempgyroValsFiltered[i] = temp;
 	}
 	
 	if(gettingGyroOffset && gyroOffsetSamples<1000){
 		for(i = 4; i < 7; i++){
-			temp = acceltempgyroValsFiltered[i]*1 + acceltempgyroVals[i];
-			acceltempgyroValsFiltered[i] = temp/2;
+			temp = acceltempgyroValsFiltered[i]*0 + acceltempgyroVals[i];
+			acceltempgyroValsFiltered[i] = temp;
 		}
 		gyroOffsetSamples++;
 		for(i = 0; i < 3; i++){
@@ -25,8 +25,8 @@ void lowPassFilterGyro(void){
 		}
 	}else{
 		for(i = 4; i < 7; i++){
-			temp = acceltempgyroValsFiltered[i]*1 + acceltempgyroVals[i] - gyroOffsets[i-4];
-			acceltempgyroValsFiltered[i] = temp/2;
+			temp = acceltempgyroVals[i] - gyroOffsets[i-4];
+			acceltempgyroValsFiltered[i] = temp;
 			angleGyro[i-4] += acceltempgyroValsFiltered[i];
 		}
 	}		

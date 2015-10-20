@@ -166,10 +166,19 @@ void myUSART_callback(uint32_t event)
 
 void sendCode(uint8_t codeToSend, uint8_t* dataBuffer){
 	int lenght = 2;
-	if(codeToSend <= 0x07){
+	buffer[1] = codeToSend;
+	if(codeToSend < 0x07){
+		buffer[0] = 'v';	
 		buffer[2] = (uint8_t)(acceltempgyroValsFiltered[codeToSend]>>8);
 		buffer[3] = (uint8_t)(acceltempgyroValsFiltered[codeToSend]);
 		lenght += 2;
+	}else if(codeToSend < 0x0A){
+		buffer[0] = 'w';	
+		buffer[2] = (uint8_t)(angleGyro[codeToSend-0x07]>>24);
+		buffer[3] = (uint8_t)(angleGyro[codeToSend-0x07]>>16);
+		buffer[4] = (uint8_t)(angleGyro[codeToSend-0x07]>>8);
+		buffer[5] = (uint8_t)(angleGyro[codeToSend-0x07]);
+		lenght += 4;
 	}
 	sendCommand(buffer, lenght);
 }
@@ -205,8 +214,6 @@ void kommuHandler(void){
 	}
 	if(kommuConnected){
 		for(i = 0; i < sendingCodesCurrent; i++){
-			buffer[0]='v';
-			buffer[1]= sendingCodes[i];
 			sendCode(sendingCodes[i],buffer);
 		}
 	}
