@@ -180,6 +180,14 @@ void sendCode(uint8_t codeToSend, uint8_t* dataBuffer){
 		buffer[5] = (uint8_t)(angleGyro[codeToSend-0x07]);
 		lenght += 4;
 	}
+	else if(codeToSend < 0x0D){
+		buffer[0] = 'w';	
+		buffer[2] = (uint8_t)(angleAccel[codeToSend-0x0A]>>24);
+		buffer[3] = (uint8_t)(angleAccel[codeToSend-0x0A]>>16);
+		buffer[4] = (uint8_t)(angleAccel[codeToSend-0x0A]>>8);
+		buffer[5] = (uint8_t)(angleAccel[codeToSend-0x0A]);
+		lenght += 4;
+	}
 	sendCommand(buffer, lenght);
 }
 

@@ -138,7 +138,7 @@ volatile void EXTI3_IRQHandler(void){
 	timeDiffMPU = current - last;
 	last = current;
 	MPU6050_GetRawAccelGyro(acceltempgyroVals);
-	lowPassFilterGyro();
+	filterMain();
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 	HAL_NVIC_ClearPendingIRQ(EXTI3_IRQn);
 }

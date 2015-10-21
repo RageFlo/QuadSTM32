@@ -111,7 +111,6 @@ int main(void)
 		while(HAL_GetTick()-delayTime<100){}
 		delayTime = HAL_GetTick();
 		//MPU6050_GetRawAccelGyro(acceltempgyroVals);
-
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 		kommuHandler();
 	}

@@ -3,8 +3,10 @@
 #define DATEN_FILTER_H
 #include "stm32f4xx_hal.h"
 
-void lowPassFilterGyro(void);
+void filterMain(void);
 
 void Get_Gyro_Offset_Start(void);
 void Get_Gyro_Offset_Stopp(void);
+
+unsigned int getFastXYAngle(int x, int y);
 #endif
