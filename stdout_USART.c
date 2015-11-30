@@ -34,6 +34,7 @@
 
 #include "stdout_USART.h"
 #include "globals.h"
+#include "PWM.h"
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
  
 // <h>STDOUT USART Interface
@@ -141,8 +142,7 @@ int sendCommand(uint8_t * toSend,int lenght){
 	
 	return 0;
 }
-void myUSART_callback(uint32_t event)
-{
+void myUSART_callback(uint32_t event){
 	switch (event)
 	{
 	case ARM_USART_EVENT_RECEIVE_COMPLETE: 
@@ -188,12 +188,54 @@ void sendCode(uint8_t codeToSend, uint8_t* dataBuffer){
 		buffer[5] = (uint8_t)(angleAccel[codeToSend-0x0A]);
 		lenght += 4;
 	}
+		else if(codeToSend < 0x11){
+		buffer[0] = 'w';	
+		buffer[2] = (uint8_t)(angleComple[codeToSend-0x0D]>>24);
+		buffer[3] = (uint8_t)(angleComple[codeToSend-0x0D]>>16);
+		buffer[4] = (uint8_t)(angleComple[codeToSend-0x0D]>>8);
+		buffer[5] = (uint8_t)(angleComple[codeToSend-0x0D]);
+		lenght += 4;
+	}
 	sendCommand(buffer, lenght);
 }
 
 void startRecording(uint8_t code){
-	if(sendingCodesCurrent < (MAX_SENDING_CODES-1)){
+		uint8_t foundToDel = 255;
+	uint8_t i;
+	for(i = 0; i < sendingCodesCurrent; i++){
+		if(sendingCodes[i] == code-'0'){
+			foundToDel = i;
+		}
+	}
+	if(foundToDel == 255 && sendingCodesCurrent < (MAX_SENDING_CODES-1)){
 		sendingCodes[sendingCodesCurrent++] = code-'0';
+	}
+}
+
+void stopRecordingAll(void){
+	sendingCodesCurrent = 0;
+}
+
+void stopRecording(uint8_t code){
+	uint8_t foundToDel = 255;
+	uint8_t i;
+	for(i = 0; i < sendingCodesCurrent; i++){
+		if(sendingCodes[i] == code){
+			foundToDel = i;
+		}
+	}
+	if(foundToDel != 255){
+		for(i = foundToDel; i < sendingCodesCurrent-1; i++){
+			sendingCodes[i] = sendingCodes[i+1];
+		}
+		sendingCodesCurrent--;
+	}
+}
+
+void changeValue(uint8_t* dataBuffer){
+	uint8_t code = dataBuffer[0]-'0';
+	if(code < 4){
+		bldc_set_power(dataBuffer[1]<<8+dataBuffer[2],code);
 	}
 }
 
@@ -213,7 +255,15 @@ void kommuHandler(void){
 			kommuNoPing = 0;
 			HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
 		break;
+		case 's':
+			stopRecording(command[1]);
+		  break;
 		case 'r':
+			if(kommuConnected){
+				startRecording(command[1]);
+			}
+			break;
+		case 'x':
 			if(kommuConnected){
 				startRecording(command[1]);
 			}

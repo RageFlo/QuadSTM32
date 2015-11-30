@@ -47,6 +47,7 @@
 #include "stdout_USART.h"
 #include "I2C_Treiber.h"
 #include "Daten_Filter.h"
+#include "PWM.h"
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -84,16 +85,25 @@ int main(void)
 	/* Configure the system clock to 168 MHz */
 	SystemClock_Config();
 	std_init();
-
+	
 	//stdin_init();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__GPIOD_CLK_ENABLE();
+	__GPIOA_CLK_ENABLE();
 	
 	ledGPIOInit.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
 	ledGPIOInit.Mode = GPIO_MODE_OUTPUT_PP;
 	ledGPIOInit.Pull = GPIO_NOPULL;
 	ledGPIOInit.Speed = GPIO_SPEED_FREQ_MEDIUM;
 	HAL_GPIO_Init(GPIOD,&ledGPIOInit);
+	
+	ledGPIOInit.Pin = GPIO_PIN_0;
+	ledGPIOInit.Mode = GPIO_MODE_INPUT;
+	ledGPIOInit.Pull = GPIO_PULLDOWN;
+	ledGPIOInit.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	HAL_GPIO_Init(GPIOA,&ledGPIOInit);
 	HAL_Delay(10);
+	
+	pwm_init();
 	
 	if(initMPU()){
 		puts("Failed MPU");
@@ -105,6 +115,7 @@ int main(void)
 	delayTime = HAL_GetTick();
 	puts("Hi!!");
 	
+	
 	/* Infinite loop */
 	while (1)
 	{
@@ -113,6 +124,9 @@ int main(void)
 		//MPU6050_GetRawAccelGyro(acceltempgyroVals);
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 		kommuHandler();
+		if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_SET){
+			pwm_set_pulsewidth(9000,1);
+		}
 	}
 }
 

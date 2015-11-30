@@ -8,6 +8,7 @@ extern int16_t acceltempgyroValsFiltered[7];
 extern int32_t timeDiffMPU;
 extern int32_t angleGyro[3];
 extern int32_t angleAccel[3];
+extern int32_t angleComple[3];
 
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority);
 void HAL_IncTick(void);

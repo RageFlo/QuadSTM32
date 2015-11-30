@@ -22,9 +22,8 @@ void filterMain(void){
 		acceltempgyroValsFiltered[i] = temp/11;
 	}
 	
-	angleAccel[0] =  getFastXYAngle(acceltempgyroVals[2],acceltempgyroVals[1]);
-	angleAccel[1] =  getFastXYAngle(acceltempgyroVals[2],acceltempgyroVals[0]);
-	angleAccel[2] =  getFastXYAngle(acceltempgyroVals[0],acceltempgyroVals[1]);
+	Get_angle_from_accle();
+	Get_angle_from_comple();
 	
 	if(gettingGyroOffset){
 		for(i = 4; i < 7; i++){
@@ -52,6 +51,17 @@ void filterMain(void){
 
 int Get_angle_from_accle(void){
 	int state = 0;
+	angleAccel[0] =  getFastXYAngle(acceltempgyroVals[2],acceltempgyroVals[1]);
+	angleAccel[1] =  getFastXYAngle(acceltempgyroVals[2],acceltempgyroVals[0]);
+	angleAccel[2] =  getFastXYAngle(acceltempgyroVals[0],acceltempgyroVals[1]);
+	return state;
+}
+
+int Get_angle_from_comple(void){
+	int state = 0;
+	angleComple[0] = (angleAccel[0]*100*131 + (angleComple[0] + acceltempgyroValsFiltered[4]/10)*99)/100;
+	angleComple[1] = (angleAccel[1]*100*131 + (angleComple[1] + acceltempgyroValsFiltered[5]/10)*99)/100;
+	angleComple[2] = (angleAccel[2]*100*131 + (angleComple[2] + acceltempgyroValsFiltered[6]/10)*99)/100;
 	return state;
 }
 
@@ -81,9 +91,9 @@ unsigned int getFastXYAngle(int x, int y){
    // Any values of X and Y are usable including negative values provided
    // they are between -1456 and 1456 so the 16bit multiply does not overflow.
 
-   unsigned char negflag;
-   unsigned char tempdegree;
-   unsigned char comp;
+   unsigned int negflag;
+   unsigned int tempdegree;
+   unsigned int comp;
    unsigned int degree;     // this will hold the result
    unsigned int ux;
    unsigned int uy;
@@ -106,49 +116,49 @@ unsigned int getFastXYAngle(int x, int y){
    // 1. Calc the scaled "degrees"
    if(ux > uy)
    {
-      degree = (uy * 45) / ux;   // degree result will be 0-45 range
+      degree = (uy * 450) / ux;   // degree result will be 0-45 range
       negflag += 0x10;    // octant flag bit
    }
    else
    {
-      degree = (ux * 45) / uy;   // degree result will be 0-45 range
+      degree = (ux * 450) / uy;   // degree result will be 0-45 range
    }
 
    // 2. Compensate for the 4 degree error curve
    comp = 0;
    tempdegree = degree;    // use an unsigned char for speed!
-   if(tempdegree > 22)      // if top half of range
+   if(tempdegree > 220)      // if top half of range
    {
-      if(tempdegree <= 44) comp++;
-      if(tempdegree <= 41) comp++;
-      if(tempdegree <= 37) comp++;
-      if(tempdegree <= 32) comp++;  // max is 4 degrees compensated
+      if(tempdegree <= 440) comp+=10;
+      if(tempdegree <= 410) comp+=10;
+      if(tempdegree <= 370) comp+=10;
+      if(tempdegree <= 320) comp+=10;  // max is 4 degrees compensated
    }
    else    // else is lower half of range
    {
-      if(tempdegree >= 2) comp++;
-      if(tempdegree >= 6) comp++;
-      if(tempdegree >= 10) comp++;
-      if(tempdegree >= 15) comp++;  // max is 4 degrees compensated
+      if(tempdegree >= 20) comp+=10;
+      if(tempdegree >= 60) comp+=10;
+      if(tempdegree >= 100) comp+=10;
+      if(tempdegree >= 150) comp+=10;  // max is 4 degrees compensated
    }
    degree += comp;   // degree is now accurate to +/- 1 degree!
 
    // Invert degree if it was X>Y octant, makes 0-45 into 90-45
-   if(negflag & 0x10) degree = (90 - degree);
+   if(negflag & 0x10) degree = (900 - degree);
 
    // 3. Degree is now 0-90 range for this quadrant,
    // need to invert it for whichever quadrant it was in
    if(negflag & 0x02)   // if -Y
    {
       if(negflag & 0x01)   // if -Y -X
-            degree = (180 + degree);
+            degree = (1800 + degree);
       else        // else is -Y +X
-            degree = (180 - degree);
+            degree = (1800 - degree);
    }
    else    // else is +Y
    {
       if(negflag & 0x01)   // if +Y -X
-            degree = (360 - degree);
+            degree = (3600 - degree);
    }
 	 return degree;
  }

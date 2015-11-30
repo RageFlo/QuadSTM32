@@ -7,6 +7,8 @@
 void myUSART_callback(uint32_t event);
 void kommuHandler(void);
 int startRec(uint8_t* buffer);
+void stopRecordingAll(void);
+void stopRecording(uint8_t code);
 
 int std_init (void);
 int stdout_putchar (int ch) ;
