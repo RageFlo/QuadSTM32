@@ -125,7 +125,9 @@ int main(void)
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 		kommuHandler();
 		if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_SET){
-			pwm_set_pulsewidth(9000,1);
+			bldc_set_power(1000,1);
+		}else{
+			bldc_set_power(0,1);
 		}
 	}
 }
