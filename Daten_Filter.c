@@ -8,7 +8,9 @@ static int32_t gyroOffsets[3] = {0,0,0};
 
 void filterMain(void){
 	int i;
+	static int period = 0;
 	int32_t temp = 0;
+	period++;
 	
 	temp = acceltempgyroVals[2] + 3670; // DYNMIC??
 	if(temp > 32767)
@@ -18,17 +20,18 @@ void filterMain(void){
 	acceltempgyroVals[2] = temp;
 	
 	for(i = 0; i < 4; i++){
-		temp = acceltempgyroValsFiltered[i]*10 + acceltempgyroVals[i];
-		acceltempgyroValsFiltered[i] = temp/11;
+		temp = acceltempgyroValsFiltered[i]*0 + acceltempgyroVals[i];
+		acceltempgyroValsFiltered[i] = temp/1;
 	}
 	
 	Get_angle_from_accle();
-	Get_angle_from_comple();
+	//if(period%10)
+		Get_angle_from_comple();
 	
 	if(gettingGyroOffset){
 		for(i = 4; i < 7; i++){
-			temp = acceltempgyroValsFiltered[i]*10 + acceltempgyroVals[i];
-			acceltempgyroValsFiltered[i] = temp/11;
+			temp = acceltempgyroValsFiltered[i]*0 + acceltempgyroVals[i];
+			acceltempgyroValsFiltered[i] = temp/1;
 		}
 		gyroOffsetSamples++;
 		for(i = 0; i < 3; i++){
@@ -59,9 +62,9 @@ int Get_angle_from_accle(void){
 
 int Get_angle_from_comple(void){
 	int state = 0;
-	angleComple[0] = (angleAccel[0]*100*131 + (angleComple[0] + acceltempgyroValsFiltered[4]/10)*99)/100;
-	angleComple[1] = (angleAccel[1]*100*131 + (angleComple[1] + acceltempgyroValsFiltered[5]/10)*99)/100;
-	angleComple[2] = (angleAccel[2]*100*131 + (angleComple[2] + acceltempgyroValsFiltered[6]/10)*99)/100;
+	angleComple[0] = (angleAccel[0]*1*131 + (angleComple[0] - acceltempgyroValsFiltered[4]/100)*2999)/3000;
+	angleComple[1] = (angleAccel[1]*1*131 + (angleComple[1] + acceltempgyroValsFiltered[5]/100)*2999)/3000;
+	angleComple[2] = (angleAccel[2]*1*131 + (angleComple[2] - acceltempgyroValsFiltered[6]/100)*2999)/3000;
 	return state;
 }
 
@@ -160,5 +163,9 @@ unsigned int getFastXYAngle(int x, int y){
       if(negflag & 0x01)   // if +Y -X
             degree = (3600 - degree);
    }
+	 //if((degree - 900) > 300)
+	//	 degree = 1200 + (degree - 1200) /4;
+	 //if((degree - 900) < 300)
+	//	 degree = 600 + (degree - 600) / 4;
 	 return degree;
  }

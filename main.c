@@ -110,7 +110,7 @@ int main(void)
 	}
 	
 	Get_Gyro_Offset_Start();
-	HAL_Delay(100);
+	HAL_Delay(2000);
 	Get_Gyro_Offset_Stopp();
 	delayTime = HAL_GetTick();
 	puts("Hi!!");

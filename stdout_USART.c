@@ -263,6 +263,9 @@ void kommuHandler(void){
 				startRecording(command[1]);
 			}
 			break;
+		case 'q':
+			stopRecordingAll();
+		  break;
 		case 'x':
 			if(kommuConnected){
 				changeValue(command+1);
