@@ -1,6 +1,7 @@
 #include "I2C_Treiber.h"
 #include "globals.h"
 #include "Daten_Filter.h"
+#include "PID.h"
 #include <stdio.h>
 #define SLAVE_ADDR (MPU6050_ADDRESS_AD0_LOW<<1)
 #define TIMEOUT 2000
@@ -139,6 +140,8 @@ volatile void EXTI3_IRQHandler(void){
 	last = current;
 	MPU6050_GetRawAccelGyro(acceltempgyroVals);
 	filterMain();
+	pidY_X = pid_run(pidDataX,angleComple[0]/131,900);
+	pidY_Y = pid_run(pidDataY,angleComple[1]/131,900);
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 	HAL_NVIC_ClearPendingIRQ(EXTI3_IRQn);
 }

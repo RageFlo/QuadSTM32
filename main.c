@@ -48,6 +48,7 @@
 #include "I2C_Treiber.h"
 #include "Daten_Filter.h"
 #include "PWM.h"
+#include "PID.h"
 
 #ifdef _RTE_
 #include "RTE_Components.h"             // Component selection
@@ -80,7 +81,8 @@ int main(void)
 {
 	GPIO_InitTypeDef ledGPIOInit;
 	uint32_t delayTime;
-
+  struct pid_datastruct pidDataXObj;
+	struct pid_datastruct pidDataYObj;
 	HAL_Init();	
 	/* Configure the system clock to 168 MHz */
 	SystemClock_Config();
@@ -114,7 +116,10 @@ int main(void)
 	Get_Gyro_Offset_Stopp();
 	delayTime = HAL_GetTick();
 	puts("Hi!!");
-	
+	pidDataX = &pidDataXObj;
+	pidDataY = &pidDataYObj;
+	pid_init(pidDataX,1000,0,1000,1,9000,900);
+	pid_init(pidDataY,1000,0,1000,1,9000,900);
 	
 	/* Infinite loop */
 	while (1)
@@ -124,6 +129,7 @@ int main(void)
 		//MPU6050_GetRawAccelGyro(acceltempgyroVals);
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 		kommuHandler();
+		
 		if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_SET){
 			bldc_set_power(1000,1);
 		}else{

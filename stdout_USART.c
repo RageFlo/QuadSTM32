@@ -71,8 +71,6 @@ static uint8_t kommuConnected = 0;
 static uint8_t kommuNoPing = 0;
 static const uint8_t maxPingsMissed = 40;
 
-
-
 int buildCommand(uint8_t* buffer, uint8_t* command){
 	static int currentPos = 0;
 	static int commandPos = 0;
@@ -188,16 +186,23 @@ void sendCode(uint8_t codeToSend, uint8_t* dataBuffer){
 		buffer[5] = (uint8_t)(angleAccel[codeToSend-0x0A]);
 		lenght += 4;
 	}
-		else if(codeToSend < 0x11){
+	else if(codeToSend < 0x11){
 		buffer[0] = 'w';	
 		buffer[2] = (uint8_t)(angleComple[codeToSend-0x0D]>>24);
 		buffer[3] = (uint8_t)(angleComple[codeToSend-0x0D]>>16);
 		buffer[4] = (uint8_t)(angleComple[codeToSend-0x0D]>>8);
 		buffer[5] = (uint8_t)(angleComple[codeToSend-0x0D]);
 		lenght += 4;
+	}else if(codeToSend == 0x11){
+		buffer[0] = 'w';	
+		buffer[2] = (uint8_t)(pidY_X>>24);
+		buffer[3] = (uint8_t)(pidY_X>>16);
+		buffer[4] = (uint8_t)(pidY_X>>8);
+		buffer[5] = (uint8_t)(pidY_X);
+		lenght += 4;
 	}
 	sendCommand(buffer, lenght);
-}
+} /* TODO BUILD HELPER FUNKTION FOR BUFFER BUILDING!!!!!!*/
 
 void startRecording(uint8_t code){
 		uint8_t foundToDel = 255;
