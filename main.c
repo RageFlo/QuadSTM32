@@ -133,7 +133,7 @@ int main(void)
 		if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_SET){
 			bldc_set_power(1000,1);
 		}else{
-			bldc_set_power(0,1);
+			bldc_set_power(power[0],1);
 		}
 	}
 }

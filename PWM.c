@@ -12,10 +12,10 @@ int pwm_init(){
 	hnd_tim1.Init.CounterMode = TIM_COUNTERMODE_UP;
 	hnd_tim1.Init.ClockDivision =  TIM_CLOCKDIVISION_DIV1;
 	hnd_tim1.Init.Period = 19999;
-	hnd_tim1.Init.Prescaler = 42;	
+	hnd_tim1.Init.Prescaler = 168;	
 	hnd_tim1.Init.RepetitionCounter = 10;
 	cConfig.OCMode =  TIM_OCMODE_PWM1;
-	cConfig.Pulse = 18999;
+	cConfig.Pulse = 19499;
 	cConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
 	cConfig.OCIdleState = TIM_OCIDLESTATE_RESET;
 	cConfig.OCFastMode = TIM_OCFAST_ENABLE;
@@ -46,7 +46,7 @@ void bldc_set_power(int newPower, int channel){
 	}else if(newPower < 0){
 		newPower  = 0;
 	}
-	pwm_set_pulsewidth(18999-newPower, channel);
+	pwm_set_pulsewidth(19499-newPower, channel);
 }
 
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *hnd){

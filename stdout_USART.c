@@ -240,7 +240,8 @@ void stopRecording(uint8_t code){
 void changeValue(uint8_t* dataBuffer){
 	uint8_t code = dataBuffer[0]-'0';
 	if(code < 4){
-		bldc_set_power((dataBuffer[1]<<8)+dataBuffer[2],code);
+		//bldc_set_power((dataBuffer[1]<<8)+dataBuffer[2],code);
+	  power[code] = (dataBuffer[1]<<8) + dataBuffer[2];
 	}
 }
 

@@ -13,7 +13,9 @@ struct pid_datastruct *pidDataY;
 
 int pidY_X;
 int pidY_Y;
- 
+
+int power[4] = {0,0,0,0};
+
 static __IO uint32_t uwTick = 0;
 static __IO uint32_t uwTick10u = 0;
 
