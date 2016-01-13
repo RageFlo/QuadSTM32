@@ -13,7 +13,6 @@ static uint8_t buffer[14];
 static uint8_t tmpBuffer[14];
 
 
-
 void DMA1_Stream5_IRQHandler(void) {
 	HAL_DMA_IRQHandler(hnd.hdmarx);
 }
@@ -21,8 +20,6 @@ void DMA1_Stream5_IRQHandler(void) {
 void DMA1_Stream6_IRQHandler(void) {
 	HAL_DMA_IRQHandler(hnd.hdmatx);
 }
-
-
 
 void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 {
@@ -103,21 +100,19 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 	__HAL_LINKDMA(hi2c, hdmatx, hndDMAtx);
 	
 	
-  //Setup the Interruptlevel
+  //Setup the Interruptlevel for I2C
   HAL_NVIC_SetPriority(I2C1_EV_IRQn, 1, 1);
 	HAL_NVIC_SetPriority(I2C1_ER_IRQn, 1, 1);
-  //enable the interrupt for USART1
+  //enable the interrupt for I2C1
   HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
 	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
-
+	//Setup the Interruptlevel for DMA
 	HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 1);
 	HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 1);
-
+  //enable the interrupt for DMA1
   HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn); 
   HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);  
-
- 
-
+	//Setup the Interruptlevel for INT-Pin GPIOB 3
 	HAL_NVIC_SetPriority(EXTI3_IRQn, 0x0F , 4);
 }
 
@@ -135,11 +130,12 @@ volatile void I2C1_ER_IRQHandler(void) {
 volatile void EXTI3_IRQHandler(void){
 	static uint32_t last = 0;
 	uint32_t current = HAL_GetTick10u();
-	
 	timeDiffMPU = current - last;
 	last = current;
 	MPU6050_GetRawAccelGyro(acceltempgyroVals);
+	
 	filterMain();
+	
 	pidY_X = pid_run(pidDataX,angleComple[0]/131,900);
 	pidY_Y = pid_run(pidDataY,angleComple[1]/131,900);
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
@@ -169,13 +165,15 @@ int initMPU(void){
 	HAL_Delay(50);
 	
 	state = HAL_I2C_GetState(&hnd); 
+	
 	if(state == HAL_I2C_STATE_READY){
 		initOkay = 0;
 	}
+	
 	printf("WHO IS MPU: %x\n",SCCB_Read(MPU6050_RA_WHO_AM_I));
 	
 	Initial_MPU6050();
-	
+	//Enable IRQ for Interupt Pin GPIOB 3
 	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
 	return initOkay;

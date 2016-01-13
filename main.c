@@ -67,9 +67,14 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+static uint32_t delayTime;
+static struct pid_datastruct pidDataXObj;
+static struct pid_datastruct pidDataYObj;
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void Error_Handler(void);
+static void main_init(void);
+static void main_loop(void);
 
 /* Private functions ---------------------------------------------------------*/
 /**
@@ -79,16 +84,27 @@ static void Error_Handler(void);
   */
 int main(void)
 {
+
+   main_init();
+
+	/* Infinite loop */
+	while (1)
+	{
+		while(HAL_GetTick10u()-delayTime<100){}
+		delayTime = HAL_GetTick();
+		main_loop();
+	}
+}
+
+
+static void main_init(void){	
 	GPIO_InitTypeDef ledGPIOInit;
-	uint32_t delayTime;
-  struct pid_datastruct pidDataXObj;
-	struct pid_datastruct pidDataYObj;
 	HAL_Init();	
+	
 	/* Configure the system clock to 168 MHz */
 	SystemClock_Config();
 	std_init();
-	
-	//stdin_init();
+
 	__GPIOD_CLK_ENABLE();
 	__GPIOA_CLK_ENABLE();
 	
@@ -112,31 +128,45 @@ int main(void)
 	}
 	
 	Get_Gyro_Offset_Start();
-	HAL_Delay(2000);
-	Get_Gyro_Offset_Stopp();
+	HAL_Delay(1000);
+	if(Get_Gyro_Offset_Stopp()<900){
+		puts("Failed Gyrooffset");
+		Error_Handler();
+	}
 	delayTime = HAL_GetTick();
-	puts("Hi!!");
+	
 	pidDataX = &pidDataXObj;
 	pidDataY = &pidDataYObj;
 	pid_init(pidDataX,1000,0,1000,1,9000,900);
 	pid_init(pidDataY,1000,0,1000,1,9000,900);
+	puts("Init + Selfcheck okay!");
+}
 	
-	/* Infinite loop */
-	while (1)
-	{
-		while(HAL_GetTick()-delayTime<100){}
-		delayTime = HAL_GetTick();
-		//MPU6050_GetRawAccelGyro(acceltempgyroVals);
+static void main_loop(void){
+	static uint32_t loopCounter = 0;
+	static uint32_t divider100ms = 100;
+	
+	if(loopCounter%divider100ms){
 		HAL_GPIO_TogglePin(GPIOD,GPIO_PIN_15);
 		kommuHandler();
-		
-		if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_SET){
-			bldc_set_power(1000,1);
-		}else{
-			bldc_set_power(power[0],1);
-		}
 	}
+	
+//	if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0) == GPIO_PIN_SET){
+//		bldc_set_power(1000,1);
+//	}else{
+//		bldc_set_power(power[0],1);
+//	}
+	loopCounter++;
 }
+
+
+
+
+
+
+
+
+
 
 /**
   * @brief  System Clock Configuration

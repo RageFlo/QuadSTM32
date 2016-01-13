@@ -1,10 +1,12 @@
 #include "Daten_Filter.h"
 #include "globals.h"
 
+#define ACCLE_Z_OFFSET 3670
+#define OFFSET_DEVIDER 10
 static uint8_t gettingGyroOffset;
 static int32_t gyroOffsetSamples = 0;
 static int32_t gyroOffsets[3] = {0,0,0};
-
+static int32_t gyroOffsetsReminder[3] = {0,0,0};
 
 void filterMain(void){
 	int i;
@@ -12,7 +14,7 @@ void filterMain(void){
 	int32_t temp = 0;
 	period++;
 	
-	temp = acceltempgyroVals[2] + 3670; // DYNMIC??
+	temp = acceltempgyroVals[2] + ACCLE_Z_OFFSET; // Correct Z Axis! DYNMIC?? 
 	if(temp > 32767)
 				temp = 32767;
 	else if(temp < -32767)
@@ -24,32 +26,26 @@ void filterMain(void){
 		acceltempgyroValsFiltered[i] = temp/1;
 	}
 	
+	for(i = 4; i < 7; i++){
+		temp = acceltempgyroVals[i] - gyroOffsets[i-4];
+		if(temp > 32767)
+			temp = 32767;
+		else if(temp < -32767)
+			temp = - 32767;
+		acceltempgyroValsFiltered[i] = temp;
+		
+		if(gettingGyroOffset){
+			gyroOffsets[i-4] = (acceltempgyroValsFiltered[i] + gyroOffsetsReminder[i-4]) / OFFSET_DEVIDER ;
+			gyroOffsetsReminder[i-4] += acceltempgyroValsFiltered[i] % OFFSET_DEVIDER;
+			gyroOffsetSamples++;
+		}
+		
+		angleGyro[i-4] += acceltempgyroValsFiltered[i];
+	}
+  
 	Get_angle_from_accle();
 	//if(period%10)
-		Get_angle_from_comple();
-	
-	if(gettingGyroOffset){
-		for(i = 4; i < 7; i++){
-			temp = acceltempgyroValsFiltered[i]*0 + acceltempgyroVals[i];
-			acceltempgyroValsFiltered[i] = temp/1;
-		}
-		gyroOffsetSamples++;
-		for(i = 0; i < 3; i++){
-			gyroOffsets[i] += acceltempgyroValsFiltered[i+4];
-		}
-		if(gyroOffsetSamples>2000)
-			Get_Gyro_Offset_Stopp();
-	}else{
-		for(i = 4; i < 7; i++){
-			temp = acceltempgyroVals[i] - gyroOffsets[i-4];
-			if(temp > 32767)
-				temp = 32767;
-			else if(temp < -32767)
-				temp = - 32767;
-			acceltempgyroValsFiltered[i] = temp;
-			angleGyro[i-4] += acceltempgyroValsFiltered[i];
-		}
-	}		
+	Get_angle_from_comple();	
 }
 
 int Get_angle_from_accle(void){
@@ -74,13 +70,12 @@ void Get_Gyro_Offset_Start(void){
 		gyroOffsetSamples = 0;
 	}
 }
-void Get_Gyro_Offset_Stopp(void){
+int Get_Gyro_Offset_Stopp(void){
 	if(gettingGyroOffset){
 		gettingGyroOffset = 0;
-		gyroOffsets[0] /= gyroOffsetSamples;
-		gyroOffsets[1] /= gyroOffsetSamples;
-		gyroOffsets[2] /= gyroOffsetSamples;
+		return gyroOffsetSamples;
 	}
+	return 0;
 }
 
 unsigned int getFastXYAngle(int x, int y){

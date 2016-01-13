@@ -6,7 +6,7 @@
 void filterMain(void);
 
 void Get_Gyro_Offset_Start(void);
-void Get_Gyro_Offset_Stopp(void);
+int Get_Gyro_Offset_Stopp(void);
 
 unsigned int getFastXYAngle(int x, int y);
 int Get_angle_from_accle(void);
